@@ -1,7 +1,7 @@
 import re
 
 def extrair_informacoes(arquivo_entrada, encoding='utf-8'):
-    padrao = re.compile(r'C\.C: (\d+) // VAL: (\d+) // C\. SEG: (\d+)')
+    padrao = re.compile(r'C\.C: (\d{4})(\d{4})(\d{4})(\d{4}) // VAL: (\d+) // C\. SEG: (\d+)')
     informacoes = set()  # Usando um conjunto para evitar repetições
 
     try:
@@ -9,8 +9,10 @@ def extrair_informacoes(arquivo_entrada, encoding='utf-8'):
             for linha in arquivo:
                 correspondencia = padrao.search(linha)
                 if correspondencia:
-                    cc, val, c_seg = correspondencia.groups()
-                    informacoes.add(f'C.C: {cc} // VAL: {val} // C. SEG: {c_seg}')
+                    grupos = correspondencia.groups()
+                    cc_formatado = ' '.join(grupos[:4])  # Separa os grupos de 4 dígitos
+                    cc = f'C.C: {cc_formatado} // VAL: {grupos[4]} // C. SEG: {grupos[5]}'
+                    informacoes.add(cc)
     except FileNotFoundError:
         print(f"O arquivo {arquivo_entrada} não foi encontrado.")
     except UnicodeDecodeError:
@@ -27,3 +29,4 @@ if __name__ == "__main__":
     arquivo_entrada = "arquivo_entrada.txt"
     informacoes = extrair_informacoes(arquivo_entrada)
     salvar_em_txt(informacoes, "arquivo_saida.txt")
+
